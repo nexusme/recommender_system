@@ -146,7 +146,7 @@ def latent_factor_model(df, class_count, iter_count, alpha, lambda_in):
     return p_result, q_result
 
 
-def recommend(df, user, p, q, TopN=5):
+def recommend(df, user_name, p, q, TopN=5):
     # 推荐TopN个物品给目标用户
     # :param frame: 源数据
     # :param user: 目标用户
@@ -154,8 +154,7 @@ def recommend(df, user, p, q, TopN=5):
     # :param q: 隐类和物品的关系
     # :param TopN: 推荐数量
     # :return: 推荐物品
-    columns = list(df.columns)
-    user_item_list = list(set(df[df['user'] == user]['movies']))
+    user_item_list = list(set(df[df['user'] == user_name]['movies']))
     other_item_list = [item for item in set(df['movies'].values) if item not in user_item_list]
     predictList = [lfm_predict(p, q, user, item) for item in other_item_list]  # 对无评分物品的兴趣度预测
     series = pd.Series(predictList, index=other_item_list)
@@ -164,10 +163,12 @@ def recommend(df, user, p, q, TopN=5):
         print('Recommendation for user *%s*: has not set. \t\n' % user)
     else:
         print('Recommendations for user *%s*:  \t\n' % user, series)
+
     return series
 
 
 if __name__ == '__main__':
+    i = 0
     df_critics = set_test_data()
     # get_positive_item(df_critics, 'Toby')
     # get_negative_item(df_critics, 'Toby')
@@ -177,5 +178,9 @@ if __name__ == '__main__':
     # p_result, q_result, user_item = initModel(df_critics, 3)
     # result_r = lfm_predict(p_result, q_result, 'Toby', 'You, Me and Dupree')
     para_p, para_q = latent_factor_model(df_critics, 3, 10, 0.02, 0.01)
+
+    dict_save = []
     for user in set(df_critics['user']):
-        recommend(df_critics, user, para_p, para_q)
+        result_series = recommend(df_critics, user, para_p, para_q)
+        dict_save.append([user, result_series.index, result_series.values])
+
