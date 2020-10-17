@@ -11,7 +11,7 @@ def data_fetch():
 
     books = []
 
-    with open('found_books_filtered.ndjson.json', 'r') as fin:
+    with open('files_are_not_here/found_books_filtered.ndjson.json', 'r') as fin:
         # Append each line to the books
         books = [json.loads(lines) for lines in fin]
 
